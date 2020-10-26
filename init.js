@@ -1,3 +1,4 @@
+//https://github.com/snabbdom/snabbdom#the-style-module
 const hooks = ["create", "update", "remove", "destroy", "pre", "post"];
 function createRmCb(childElm, listeners) {
 	return function rmCb() {
