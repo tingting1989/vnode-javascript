@@ -6,20 +6,17 @@ function createRmCb(childElm, listeners) {
 			htmlDomApi.removeChild(parent, childElm);
 		}
 	};
-    
 }
 
-
-
-function createKeyToOldIdx (children, beginIdx, endIdx) {
-  const  KeyToIndexMap = {}
-  for (let i = beginIdx; i <= endIdx; ++i) {
-    const key = children[i] && children[i].key
-    if (key !== undefined) {
-      map[key] = i
-    }
-  }
-  return map
+function createKeyToOldIdx(children, beginIdx, endIdx) {
+	const map = {};
+	for (let i = beginIdx; i <= endIdx; ++i) {
+		const key = children[i] && children[i].key;
+		if (key !== undefined) {
+			map[key] = i;
+		}
+	}
+	return map;
 }
 
 function emptyNodeAt(elm) {
@@ -56,8 +53,6 @@ function init(modules) {
 			}
 		}
 	}
-
-
 
 	//vnode =>真实dom
 
@@ -240,6 +235,15 @@ function init(modules) {
 				newEndVnode = newCh[--newEndIdx];
 			} else if (sameVnode(oldStartVnode, newEndVnode)) {
 				// Vnode moved right
+
+				// 把获得更新后的 (oldStartVnode/newEndVnode) 的 dom 右移，移动到
+				// oldEndVnode 对应的 dom 的右边。为什么这么右移？
+				// （1）oldStartVnode 和 newEndVnode 相同，显然是 vnode 右移了。
+				// （2）若 while 循环刚开始，那移到 oldEndVnode.elm 右边就是最右边，是合理的；
+				// （3）若循环不是刚开始，因为比较过程是两头向中间，那么两头的 dom 的位置已经是
+				//     合理的了，移动到 oldEndVnode.elm 右边是正确的位置；
+				// （4）记住，oldVnode 和 vnode 是相同的才 patch，且 oldVnode 自己对应的 dom
+				//     总是已经存在的，vnode 的 dom 是不存在的，直接复用 oldVnode 对应的 dom。
 				patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
 				htmlDomApi.insertBefore(
 					parentElm,
@@ -351,7 +355,7 @@ function init(modules) {
 			}
 			htmlDomApi.setTextContent(elm, vnode.text);
 		}
-		hook && hook.postpatch && hook.post.patch(oldVnode, vnode);
+		hook && hook.postpatch && hook.postpatch(oldVnode, vnode);
 	}
 
 	return function patch(oldVnode, vnode) {
@@ -384,7 +388,9 @@ function init(modules) {
 		}
 
 		for (i = 0; i < insertedVnodeQueue.length; ++i) {
-		    insertedVnodeQueue[i].data&&insertedVnodeQueue[i].data.hook&&insertedVnodeQueue[i].data.hook.insert(insertedVnodeQueue[i])
+			insertedVnodeQueue[i].data &&
+				insertedVnodeQueue[i].data.hook &&
+				insertedVnodeQueue[i].data.hook.insert(insertedVnodeQueue[i]);
 		}
 		for (i = 0; i < cbs.post.length; ++i) cbs.post[i]();
 		return vnode;
