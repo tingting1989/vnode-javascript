@@ -6,6 +6,20 @@ function createRmCb(childElm, listeners) {
 			htmlDomApi.removeChild(parent, childElm);
 		}
 	};
+    
+}
+
+
+
+function createKeyToOldIdx (children, beginIdx, endIdx) {
+  const  KeyToIndexMap = {}
+  for (let i = beginIdx; i <= endIdx; ++i) {
+    const key = children[i] && children[i].key
+    if (key !== undefined) {
+      map[key] = i
+    }
+  }
+  return map
 }
 
 function emptyNodeAt(elm) {

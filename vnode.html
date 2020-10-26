@@ -30,10 +30,9 @@
             }
 
             .btn:active,
-            .active,
+            .btn.active,
             .active:hover {
-                box-shadow: 0 0 1px rgba(0, 0, 0, .2),
-                    inset 0 0 4px rgba(0, 0, 0, .1);
+                border: 1px solid #C25151;
             }
 
             .add {
@@ -160,9 +159,10 @@
                 originalData[9],
             ]
 
-            function changeSort(prop) {
+            function changeSort(event,prop) {
                 console.log(prop)
-                sortBy = prop
+                sortBy = prop.data.on.click[1]
+                console.log(sortBy)
                 data.sort((a, b) => {
                     if (a[prop] > b[prop]) {
                         return 1
@@ -183,10 +183,18 @@
                 render()
             }
 
-            function remove(movie) {
-                console.log(movie)
+            function remove(event,movie) {
+                console.log(movie.data.on.click[1])
                 data = data.filter((m) => {
-                    return m !== movie
+                    return m !== movie.data.on.click[1]
+                })
+                render()
+            }
+
+            function update(event,movie){
+
+                data = data.filter((m) => {
+                    return m !== movie.data.on.click[1]
                 })
                 render()
             }
