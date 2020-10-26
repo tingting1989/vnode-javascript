@@ -1,5 +1,17 @@
 const emptyNode = vnode("", {}, [], undefined, undefined);
 
+//vnode
+
+// [
+//   {
+//     sel: 'h1', // String
+//     data: {}, //Object
+//     children: undefined, //Array  For example h('div', {}, [ h('h1', {}, 'Hello, World') ]) will create a virtual node with
+//     text: 'Hello, World', //string For example: h('h1', {}, 'Hello') will create a virtual node with Hello as its .text property.
+//     elm: Element,
+//     key: undefined, //string | number //If provided, the .key property must be unique among sibling elements. For example: h('div', {key: 1}, []) will create a virtual node object with a .key property with the value of 1.
+//   }
+// ]
 function vnode(sel, data, children, text, elm) {
 	const key = data === undefined ? undefined : data.key;
 	return { sel, data, children, text, elm, key };
@@ -40,7 +52,6 @@ function toVNode(node) {
 	}
 }
 
-
 function addNS(data, children, sel) {
 	data.ns = "http://www.w3.org/2000/svg";
 	if (sel !== "foreignObject" && children !== undefined) {
@@ -52,14 +63,13 @@ function addNS(data, children, sel) {
 		}
 	}
 }
-//h 生成vnode
+//h 生成vnode sel=> div/h1...,
 function h(sel, b, c) {
 	var data = {},
 		children,
 		text,
 		i = 0;
-
-	if (c !== undefined) {
+	if (arguments.length === 3) {
 		if (b !== null) {
 			data = b;
 		}
@@ -69,9 +79,10 @@ function h(sel, b, c) {
 		} else if (is.primitive(c)) {
 			text = c;
 		} else if (c && c.sel) {
+            //console.log(c)
 			children = [c];
 		}
-	} else if (b !== undefined && b !== null) {
+	} else if (arguments.length === 2) {
 		if (is.array(b)) {
 			children = b;
 		} else if (is.primitive(b)) {
@@ -85,6 +96,7 @@ function h(sel, b, c) {
 
 	if (children !== undefined) {
 		for (i = 0; i < children.length; ++i) {
+            console.log(children[i])
 			if (is.primitive(children[i])) {
 				children[i] = vnode(
 					undefined,

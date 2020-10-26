@@ -98,7 +98,8 @@
     <body>
 
         <div id="container"></div>
-
+        <script src="./dataset.js"></script>
+        <script src="./attributes.js"></script>
         <script src="./class.js"></script>
         <script src="./style.js"></script>
         <script src="./eventlisteners.js"></script>
@@ -126,7 +127,7 @@
 
 
 
-            var patch = init([classModule, styleModule, eventListenersModule, propsModule])
+            var patch = init([classModule, styleModule, eventListenersModule, propsModule, attributesModule,datasetModule])
 
             var $vnode
 
@@ -160,7 +161,7 @@
             ]
 
             function changeSort(event, vnode) {
-                
+
 
                 let prop;
                 prop = sortBy = vnode.data.on.click[1]
@@ -241,7 +242,7 @@
                         h('a.btn.add', {on: {click: add}}, 'Add'),
                         'Sort by: ',
                         h('span.btn-group', [
-                            h('a.btn.rank', {class: {active: sortBy === 'rank'}, on: {click: [changeSort, 'rank']}}, 'Rank'),
+                            h('a.btn.rank', {class: {active: sortBy === 'rank'}, on: {click: [changeSort, 'rank']}, dataset: {action: 'reset'}}, 'Rank'),
                             h('a.btn.title', {class: {active: sortBy === 'title'}, on: {click: [changeSort, 'title']}}, 'Title'),
                             h('a.btn.desc', {class: {active: sortBy === 'desc'}, on: {click: [changeSort, 'desc']}}, 'Description'),
                         ]),
