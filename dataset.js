@@ -12,6 +12,7 @@ function updateDataset(oldVnode, vnode) {
 	dataset = dataset || {};
 	const d = elm.dataset;
 
+
 	for (key in oldDataset) {
 		if (!dataset[key]) {
 			if (d) {
@@ -26,6 +27,7 @@ function updateDataset(oldVnode, vnode) {
 		}
 	}
 	for (key in dataset) {
+   
 		if (oldDataset[key] !== dataset[key]) {
 			if (d) {
 				d[key] = dataset[key];

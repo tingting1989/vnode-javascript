@@ -96,7 +96,7 @@ function h(sel, b, c) {
 
 	if (children !== undefined) {
 		for (i = 0; i < children.length; ++i) {
-            console.log(children[i])
+            
 			if (is.primitive(children[i])) {
 				children[i] = vnode(
 					undefined,

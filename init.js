@@ -1,4 +1,5 @@
 //https://github.com/snabbdom/snabbdom#the-style-module
+//https://www.cnblogs.com/zhangycun/p/10484867.html
 const hooks = ["create", "update", "remove", "destroy", "pre", "post"];
 function createRmCb(childElm, listeners) {
 	return function rmCb() {
@@ -202,8 +203,22 @@ function init(modules) {
 			}
 		}
 	}
+	// diff算法
+
+	//   【1】.判断 oldCh 第一个节点元素是不是空的，如果是空的表示 DOM 已经移除，接着进行下一轮比较
+	//   【2】.判断 oldCh 最后一个节点元素是不是空的，如果是空的表示 DOM 已经移除，接着进行下一轮比较
+	//   【3】.判断 newCh 第一个节点元素是不是空的，如果是空的表示 DOM 已经移除，接着进行下一轮比较
+	//   【4】.判断 newCh 最后一个节点元素是不是空的，如果是空的表示 DOM 已经移除，接着进行下一轮比较。
+	//   【5】.判断 oldCh 与 newCh 第一个节点元素是不是相同，如果相同我们接着进行下一轮比较
+	//   【6】.判断 oldCh 与 newCh 最后一个节点元素是不是相同，如果相同我们接着进行下一轮比较
+	//   【7】.判断 oldCh 第一个节点元素与 newCh 的最后一个节点元素是否相同，如果相同，就将oldCh 第一个节点元素进行移动
+	//   【8】.判断 oldCh 最后一个节点元素与 newCh 的第一个节点元素是否相同，如果相同，就将oldCh 最后一个节点元素进行移动
 
 	function updateChildren(parentElm, oldCh, newCh, insertedVnodeQueue) {
+		//算法解析
+		//http://qiutianaimeili.com/html/page/2018/05/4si69yn4stl.html
+		//https://www.jianshu.com/p/f45463e7be20
+		//https://www.cnblogs.com/zhangycun/p/10484867.html
 		let oldStartIdx = 0;
 		let newStartIdx = 0;
 		let oldEndIdx = oldCh.length - 1;
@@ -216,25 +231,53 @@ function init(modules) {
 		let idxInOld = 0;
 		let elmToMove;
 		let before;
-
+		//旧vnode与新vnode比较
+		//逐个遍历newVdom的节点，找到它在oldVdom中的位置，如果找到了就移动对应的DOM元素，如果没找到说明是新增节点，则新建一个节点插入。遍历完成之后如果oldVdom中还有没处理过的节点，则说明这些节点在newVdom中被删除了，删除它们即可
 		while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+			//1、
 			if (oldStartVnode == null) {
+				console.log("oldStartVnode==null");
 				oldStartVnode = oldCh[++oldStartIdx]; // Vnode might have been moved left
 			} else if (oldEndVnode == null) {
+				//2、
+				console.log("oldEndVnode==null");
 				oldEndVnode = oldCh[--oldEndIdx];
 			} else if (newStartVnode == null) {
+				//3、
+				console.log("newStartVnode==null");
 				newStartVnode = newCh[++newStartIdx];
 			} else if (newEndVnode == null) {
+				//4、
+				console.log("newEndVnode==null");
 				newEndVnode = newCh[--newEndIdx];
 			} else if (sameVnode(oldStartVnode, newStartVnode)) {
+				//5、move right
 				patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue);
 				oldStartVnode = oldCh[++oldStartIdx];
 				newStartVnode = newCh[++newStartIdx];
 			} else if (sameVnode(oldEndVnode, newEndVnode)) {
+				//6、move left
+				//console.log(1);
 				patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue);
 				oldEndVnode = oldCh[--oldEndIdx];
 				newEndVnode = newCh[--newEndIdx];
+
+				// console.log(
+				// 	"oldEndIdx",
+				// 	oldEndIdx,
+				// 	";newEndIdx:",
+				// 	newEndIdx,
+				// 	";oldStartIdx;",
+				// 	oldStartIdx,
+				// 	";oldEndVnode:",
+				// 	oldEndVnode,
+
+				// 	";newEndVnode:",
+				// 	newEndVnode
+				// );
+				//console.log(2);
 			} else if (sameVnode(oldStartVnode, newEndVnode)) {
+				//7、首尾比较
 				// Vnode moved right
 
 				// 把获得更新后的 (oldStartVnode/newEndVnode) 的 dom 右移，移动到
@@ -246,6 +289,11 @@ function init(modules) {
 				// （4）记住，oldVnode 和 vnode 是相同的才 patch，且 oldVnode 自己对应的 dom
 				//     总是已经存在的，vnode 的 dom 是不存在的，直接复用 oldVnode 对应的 dom。
 				patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
+
+				// function insertBefore (parentNode, newNode, referenceNode) {
+				//     parentNode.insertBefore(newNode, referenceNode);
+				// }
+
 				htmlDomApi.insertBefore(
 					parentElm,
 					oldStartVnode.elm,
@@ -254,6 +302,8 @@ function init(modules) {
 				oldStartVnode = oldCh[++oldStartIdx];
 				newEndVnode = newCh[--newEndIdx];
 			} else if (sameVnode(oldEndVnode, newStartVnode)) {
+				//8、尾首比较
+				console.log(newStartVnode);
 				// Vnode moved left
 				patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue);
 				htmlDomApi.insertBefore(
@@ -264,6 +314,7 @@ function init(modules) {
 				oldEndVnode = oldCh[--oldEndIdx];
 				newStartVnode = newCh[++newStartIdx];
 			} else {
+				console.log(oldKeyToIdx);
 				if (oldKeyToIdx === undefined) {
 					oldKeyToIdx = createKeyToOldIdx(
 						oldCh,
@@ -274,20 +325,25 @@ function init(modules) {
 				idxInOld = oldKeyToIdx[newStartVnode.key];
 				if (isUndef(idxInOld)) {
 					// New element
+                    //new start节点在old中没有找到 则新增new start节点 位置在 oldStartVnode 前
 					htmlDomApi.insertBefore(
 						parentElm,
 						createElm(newStartVnode, insertedVnodeQueue),
 						oldStartVnode.elm
 					);
 				} else {
+                    // move node
+                    console.log(123456)
 					elmToMove = oldCh[idxInOld];
 					if (elmToMove.sel !== newStartVnode.sel) {
+                        //new start节点在old中找到 但不是同类型节点 则新增 new start节点 位置在 oldStartVnode 前
 						htmlDomApi.insertBefore(
 							parentElm,
 							createElm(newStartVnode, insertedVnodeQueue),
 							oldStartVnode.elm
 						);
 					} else {
+                        //new start节点在old中找到 并且是同类型节点 则move new start节点 位置在 oldStartVnode 前
 						patchVnode(
 							elmToMove,
 							newStartVnode,
@@ -304,7 +360,10 @@ function init(modules) {
 				newStartVnode = newCh[++newStartIdx];
 			}
 		}
+		//循环结束之后，可能newVdom或者oldVdom中还有未处理的节点，如果是newVdom中有未处理节点，则这些节点是新增节点，做新增处理。
+		//如果是oldVdom中有这类节点，则这些是需要删除的节点，相应在DOM树中删除之
 		if (oldStartIdx <= oldEndIdx || newStartIdx <= newEndIdx) {
+			console.log("end", oldStartIdx, oldEndIdx);
 			if (oldStartIdx > oldEndIdx) {
 				before =
 					newCh[newEndIdx + 1] == null
@@ -330,7 +389,9 @@ function init(modules) {
 		const elm = (vnode.elm = oldVnode.elm);
 		const oldCh = oldVnode.children;
 		const ch = vnode.children;
-		if (oldVnode === vnode) return;
+		if (oldVnode === vnode) {
+			return;
+		}
 		if (vnode.data !== undefined) {
 			for (let i = 0; i < cbs.update.length; ++i)
 				cbs.update[i](oldVnode, vnode);
@@ -338,6 +399,7 @@ function init(modules) {
 				vnode.data.hook.update &&
 				vnode.data.hook.update(oldVnode, vnode);
 		}
+
 		if (isUndef(vnode.text)) {
 			if (isDef(oldCh) && isDef(ch)) {
 				if (oldCh !== ch)
@@ -351,6 +413,7 @@ function init(modules) {
 				htmlDomApi.setTextContent(elm, "");
 			}
 		} else if (oldVnode.text !== vnode.text) {
+			console.log(oldCh, oldVnode.text, vnode.text);
 			if (isDef(oldCh)) {
 				removeVnodes(elm, oldCh, 0, oldCh.length - 1);
 			}

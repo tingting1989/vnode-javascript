@@ -17,6 +17,7 @@ function setNextFrame(obj, prop, val) {
 }
 
 function updateStyle(oldVnode, vnode) {
+
 	var cur;
 	var name;
 	var elm = vnode.elm;

@@ -96,6 +96,7 @@
     </head>
 
     <body>
+        <img src="./4si69yn4stl_8.svg" alt="" srcset="">
 
         <div id="container"></div>
         <script src="./dataset.js"></script>
@@ -127,7 +128,7 @@
 
 
 
-            var patch = init([classModule, styleModule, eventListenersModule, propsModule, attributesModule,datasetModule])
+            var patch = init([classModule, styleModule, eventListenersModule, propsModule, attributesModule, datasetModule])
 
             var $vnode
 
@@ -151,13 +152,13 @@
                 originalData[0],
                 originalData[1],
                 originalData[2],
-                originalData[3],
-                originalData[4],
-                originalData[5],
-                originalData[6],
-                originalData[7],
-                originalData[8],
-                originalData[9],
+                // originalData[3],
+                // originalData[4],
+                // originalData[5],
+                // originalData[6],
+                // originalData[7],
+                // originalData[8],
+                // originalData[9],
             ]
 
             function changeSort(event, vnode) {
@@ -181,29 +182,32 @@
             }
 
             function add() {
-                console.log(1234)
+
                 var n = originalData[Math.floor(Math.random() * 10)]
                 data = [{rank: nextKey++, title: n.title, desc: n.desc, elmHeight: 0}].concat(data)
+                //data.push({rank: nextKey++, title: n.title, desc: n.desc, elmHeight: 0})
+                //data = [data[0]].concat([{rank: nextKey++, title: n.title, desc: n.desc, elmHeight: 0}]).concat(data[1],data[2])
                 render()
                 render()
             }
 
             function remove(event, movie) {
-                console.log(movie.data.on.click[1])
-                data = data.filter((m) => {
-                    return m !== movie.data.on.click[1]
-                })
-                render()
-            }
-
-            function update(event, movie) {
-
 
                 data = data.filter((m) => {
                     return m !== movie.data.on.click[1]
                 })
                 render()
             }
+
+            let hideFirstTitle = false
+            function update() {
+                console.log(1234)
+                originalData[0].title = 12345;
+                hideFirstTitle = !hideFirstTitle
+                render()
+            }
+
+
 
             function movieView(movie) {
                 return h('div.row', {
@@ -217,7 +221,7 @@
                     hook: {insert: ($vnode) => {movie.elmHeight = $vnode.elm.offsetHeight}},
                 }, [
                     h('div', {style: {fontWeight: 'bold'}}, movie.rank),
-                    h('div', movie.title),
+                    !hideFirstTitle ? h('div', movie.title) : "",
                     h('div', movie.desc),
                     h('div.btn.rm-btn', {on: {click: [remove, movie]}}, 'x'),
                 ])
@@ -236,15 +240,23 @@
             }
 
             function view(data) {
-                return h('div', [
+                return h('p', [
                     h('h1', 'Top 10 movies'),
                     h('div', [
-                        h('a.btn.add', {on: {click: add}}, 'Add'),
+                        h('a', {
+                            props: {className: 'btn add'},
+                            on: {click: add},
+                            attrs: {mmm: 1, nnnn: 2},
+                            style: {border: '1px solid #ccc'}
+                        },
+                            'Add'
+                        ),
                         'Sort by: ',
                         h('span.btn-group', [
                             h('a.btn.rank', {class: {active: sortBy === 'rank'}, on: {click: [changeSort, 'rank']}, dataset: {action: 'reset'}}, 'Rank'),
                             h('a.btn.title', {class: {active: sortBy === 'title'}, on: {click: [changeSort, 'title']}}, 'Title'),
                             h('a.btn.desc', {class: {active: sortBy === 'desc'}, on: {click: [changeSort, 'desc']}}, 'Description'),
+                            h('a.btn.update', {class: {active: sortBy === 'update'}, on: {click: [update, 'update']}}, 'Update'),
                         ]),
                     ]),
                     h('div.list', {style: {height: totalHeight + 'px'}}, data.map(movieView)),

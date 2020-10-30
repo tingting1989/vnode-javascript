@@ -4,6 +4,7 @@
 // export type Props = Record<string, any>
 
 function updateProps(oldVnode, vnode) {
+ 
 	var key;
 	var cur;
 	var old;

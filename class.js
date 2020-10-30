@@ -28,6 +28,9 @@ function updateClass(oldVnode, vnode) {
 }
 
 const classModule = {
+    pre:function(){
+        console.log('classModule-pre')
+    },
 	create: updateClass,
 	update: updateClass,
 };
