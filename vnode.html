@@ -267,6 +267,8 @@
             window.addEventListener('DOMContentLoaded', () => {
                 var container = document.getElementById('container')
                 $vnode = patch(container, view(data))
+
+                console.log($vnode)
                 render()
             })
 

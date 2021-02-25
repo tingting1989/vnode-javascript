@@ -325,25 +325,24 @@ function init(modules) {
 				idxInOld = oldKeyToIdx[newStartVnode.key];
 				if (isUndef(idxInOld)) {
 					// New element
-                    //new start节点在old中没有找到 则新增new start节点 位置在 oldStartVnode 前
+					//new start节点在old中没有找到 则新增new start节点 位置在 oldStartVnode 前
 					htmlDomApi.insertBefore(
 						parentElm,
 						createElm(newStartVnode, insertedVnodeQueue),
 						oldStartVnode.elm
 					);
 				} else {
-                    // move node
-                    console.log(123456)
+					// move node
 					elmToMove = oldCh[idxInOld];
 					if (elmToMove.sel !== newStartVnode.sel) {
-                        //new start节点在old中找到 但不是同类型节点 则新增 new start节点 位置在 oldStartVnode 前
+						//new start节点在old中找到 但不是同类型节点 则新增 new start节点 位置在 oldStartVnode 前
 						htmlDomApi.insertBefore(
 							parentElm,
 							createElm(newStartVnode, insertedVnodeQueue),
 							oldStartVnode.elm
 						);
 					} else {
-                        //new start节点在old中找到 并且是同类型节点 则move new start节点 位置在 oldStartVnode 前
+						//new start节点在old中找到 并且是同类型节点 则move new start节点 位置在 oldStartVnode 前
 						patchVnode(
 							elmToMove,
 							newStartVnode,
@@ -360,6 +359,10 @@ function init(modules) {
 				newStartVnode = newCh[++newStartIdx];
 			}
 		}
+		// 最后 通过 oldStartIdx > oldEndIdx ，来判断 oldCh 和 newCh 哪一个先遍历完成
+		// oldCh 先遍历完成,则证明 newCh 还有多余节点，需要新增这些节点
+		// newCh 先遍历完成,则证明 oldCh 还有多余节点，需要删除这些节点
+
 		//循环结束之后，可能newVdom或者oldVdom中还有未处理的节点，如果是newVdom中有未处理节点，则这些节点是新增节点，做新增处理。
 		//如果是oldVdom中有这类节点，则这些是需要删除的节点，相应在DOM树中删除之
 		if (oldStartIdx <= oldEndIdx || newStartIdx <= newEndIdx) {
